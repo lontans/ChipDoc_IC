@@ -25,7 +25,6 @@ chipdoc/
 ├── docs/
 │   ├── architecture.md     ← block diagrams, design decisions
 │   ├── register_map.md     ← I2C registers (fill in Phase 3)
-│   └── datasheet_notes/    ← your notes from today's reading
 ├── sim/
 │   └── fsm_sim.py          ← Python behavioral simulator
 ├── rtl/
