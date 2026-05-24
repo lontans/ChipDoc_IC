@@ -49,7 +49,6 @@ module tb_cd1624_top;
     initial begin
         $dumpfile("tb_cd1624_top.vcd");
         $dumpvars(0, tb_cd1624_top);
-        $dumpvars(0, DUT);
     end
 
     // heartbeat task — toggles hb at given period for n cycles
@@ -103,17 +102,17 @@ module tb_cd1624_top;
 
         // clear OC — auto recover
         isen_a = 8'd100;
-        #100;
+        #300;
 
         // ── scenario 3: overvoltage rail B ──────────────────────
         // immediate fault, no warn — latching
         vsen_b = 8'd220;   // above OV threshold of 200
         send_heartbeat(4, 20);
-        #100;
+        #300;
 
         // OV clears — should stay in FAULT (latched)
         vsen_b = 8'd150;
-        #100;
+        #300;
 
         // assert MR — should recover
         mr = 1'b1;
@@ -124,21 +123,21 @@ module tb_cd1624_top;
         // vsen_a drops below UV threshold — WARN then FAULT
         vsen_a = 8'd50;    // below UV threshold of 80
         send_heartbeat(6, 20);
-        #200;
+        #300;
 
         // voltage recovers — auto recover
         vsen_a = 8'd150;
-        #100;
+        #300;
 
         // ── scenario 5: overtemperature ─────────────────────────
         // tsen crosses OT threshold — WARN then FAULT
         tsen = 8'd200;     // above OT threshold of 180
         send_heartbeat(6, 20);
-        #200;
+        #300;
 
         // temperature recovers
         tsen = 8'd100;
-        #100;
+        #400;
 
         // ── scenario 6: missing heartbeat ───────────────────────
         // stop toggling HB — wd_timer times out after HB_TIMEOUT=20 cycles
@@ -160,7 +159,7 @@ module tb_cd1624_top;
 
         isen_a = 8'd100;
         vsen_b = 8'd150;
-        #100;
+        #400;
 
         // ── scenario 8: reset during fault ──────────────────────
         vsen_a = 8'd220;   // OV — immediate fault
