@@ -49,6 +49,7 @@ module tb_cd1624_top;
     initial begin
         $dumpfile("tb_cd1624_top.vcd");
         $dumpvars(0, tb_cd1624_top);
+        $dumpvars(0, DUT);
     end
 
     // heartbeat task — toggles hb at given period for n cycles

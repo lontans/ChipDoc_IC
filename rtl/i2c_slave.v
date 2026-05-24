@@ -1,5 +1,7 @@
 // I2C module, processes reference signals
 
+`timescale 1ns/1ps
+
 module i2c_slave
 (
     input  wire        clk,

@@ -1,9 +1,10 @@
-`include "comparator.v"
-`include "debounce.v"
-`include "edge_detect.v"
-`include "fault_fsm.v"
-`include "wd_timer.v"
-`include "i2c_slave.v"
+`include "rtl/comparator.v"
+`include "rtl/debounce.v"
+`include "rtl/edge_detect.v"
+`include "rtl/fault_fsm.v"
+`include "rtl/wd_timer.v"
+`include "rtl/i2c_slave.v"
+`timescale 1ns/1ps
 
 module cd1624_top #(
     parameter CLK = 100, // default 100MHz
@@ -17,20 +18,20 @@ module cd1624_top #(
     parameter HYST        = 8'd10,
     parameter HB_TIMEOUT  = 16'd10000
 )(
-    input wire  vsen_a,
-    input wire  vsen_b,
-    input wire  isen_a,
-    input wire  isen_b,
-    input wire  tsen,
-    input wire  hb,
-    input wire  mr,
-    input wire  mode,
-    input wire  scl,
-    input wire  sda,
-    input wire  rst_n,
-    output wire health,
-    output wire warn,
-    output wire en_out
+    input wire [7:0] vsen_a,
+    input wire [7:0] vsen_b,
+    input wire [7:0] isen_a,
+    input wire [7:0] isen_b,
+    input wire [7:0] tsen,
+    input wire       hb,
+    input wire       mr,
+    input wire       mode,
+    input wire       scl,
+    input wire       sda,
+    input wire       rst_n,
+    output wire      health,
+    output wire      warn,
+    output wire      en_out
 );
 
 reg int_clk;
@@ -59,7 +60,7 @@ i2c_slave i2c_slave (
     .v_ref_ov_b_dflt (V_REF_OV_B),
     .v_ref_ot_dflt   (V_REF_OT  ),
     .hyst_dflt       (HYST      ),
-    .hb_timeout      (HB_TIMEOUT),
+    .hb_timeout_dflt (HB_TIMEOUT),
     .v_ref_oc_a      (v_ref_oc_a),
     .v_ref_oc_b      (v_ref_oc_b),
     .v_ref_uv_a      (v_ref_uv_a),

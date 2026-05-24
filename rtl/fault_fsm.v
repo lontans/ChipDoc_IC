@@ -7,6 +7,8 @@
 // inputs:  clk, rst_n, oc_a, oc_b, uv_a, ov_a, uv_b, ov_b, ot, hb_fault, mr
 // outputs: en_out, health, warn
 
+`timescale 1ns/1ps
+
 module fault_fsm
 (
     input wire clk,

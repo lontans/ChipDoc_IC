@@ -3,6 +3,8 @@
 // 2. Output 1 if the first number is greater than the second, otherwise output 0
 // Value: inputs for v_in, v_ref, hyst etc, outputs fault signal
 // Vin, Vref, Hyst, Vout
+`timescale 1ns/1ps
+
 module comparator #(
     parameter WIDTH = 8
 )(

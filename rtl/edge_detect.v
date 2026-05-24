@@ -1,6 +1,8 @@
 // Edge detector module
 // edge_pulse = 1 for one clock cycle during edge transition
 
+`timescale 1ns/1ps
+
 module edge_detect
 (
     input wire hb_in,

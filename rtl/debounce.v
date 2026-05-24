@@ -12,6 +12,7 @@
 // fault_in high → increment counter
 // fault_in low  → reset counter to 0
 // fault_out     → counter >= THRESHOLD
+`timescale 1ns/1ps
 
 module debounce #(
     parameter THRESHOLD = 10,

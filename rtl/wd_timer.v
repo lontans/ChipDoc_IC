@@ -3,6 +3,8 @@
 // takes edge_pulse from edge_detect and outputs hb_fault to the FSM. 
 // Conceptually just a counter that resets on every pulse and faults when it times out.
 
+`timescale 1ns/1ps
+
 module wd_timer #(
     parameter WIDTH = 16
 
