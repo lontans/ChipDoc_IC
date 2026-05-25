@@ -27,7 +27,7 @@ module cd1624_top #(
     input wire       mr,
     input wire       mode,
     input wire       scl,
-    input wire       sda,
+    inout wire       sda,
     input wire       rst_n,
     output wire      health,
     output wire      warn,
@@ -45,6 +45,11 @@ wire [7:0]  v_ref_uv_a, v_ref_uv_b;
 wire [7:0]  v_ref_ot;
 wire [7:0]  hyst;
 wire [15:0] hb_timeout;
+wire [2:0] fsm_state;
+wire [7:0] fault_status;
+wire sda_oe;
+assign sda = sda_oe ? 1'b0 : 1'bz; // Set sda combinationally, z is ambiguous (unlatched)
+
 
 i2c_slave i2c_slave (
     .clk             (int_clk     ),
@@ -71,7 +76,8 @@ i2c_slave i2c_slave (
     .hyst            (hyst        ),
     .hb_timeout      (hb_timeout  ),
     .fsm_state       (fsm_state   ),
-    .fault_status    (fault_status)
+    .fault_status    (fault_status),
+    .sda_oe          (sda_oe      )
 );
 
 
@@ -223,9 +229,6 @@ wd_timer #(.WIDTH(16)) hb_wd_timer (
 );
 
 // Fault FSM
-wire [2:0] fsm_state;
-wire [7:0] fault_status;
-
 fault_fsm fault_fsm (
     .clk          (int_clk),
     .rst_n        (rst_n),
@@ -241,8 +244,8 @@ fault_fsm fault_fsm (
     .en_out       (en_out),
     .health       (health),
     .warn         (warn),
+    .fault_status (fault_status),
     .state        (fsm_state)
-    .
 );
 
 endmodule

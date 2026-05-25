@@ -32,7 +32,8 @@ module i2c_slave
     output  wire [7:0]  v_ref_ov_b,
     output  wire [7:0]  v_ref_ot,
     output  wire [7:0]  hyst,
-    output  wire [15:0] hb_timeout
+    output  wire [15:0] hb_timeout,
+    output  reg sda_oe  // 1 = pull low (NACK/DATA LOW), 0 = release (ACK/Data HIGH)
 );
 
 // Parameters and State Encoding:
@@ -51,7 +52,6 @@ localparam I2C_READ_ACK  = 4'd8;
 reg sda_prev;
 wire start_det;
 wire stop_det;
-reg sda_oe;  // 1 = pull low (ACK), 0 = release
 
 // Shift register and byte tracking
 reg [7:0] sda_buffer;  // shifts in bits from SDA, complete byte read when bit_cnt==7, becomes data
@@ -86,28 +86,18 @@ always @(posedge scl or negedge rst_n) begin
     if (!rst_n) 
         sda_buffer <= 8'h00;
     else
-        sda_buffer <= {sda_buffer[6:0], sda} // shift sda_buffer left, new bit at LSb
+        sda_buffer <= {sda_buffer[6:0], sda}; // shift sda_buffer left, new bit at LSb
 end
 
 // Bit counter
-always @(posedge scl or negedge rst_n or start_det) begin
+always @(posedge scl or negedge rst_n) begin
     if (!rst_n || start_det)
         bit_cnt <= 3'd0; // Start bit, restart at 0
+    else if (bit_cnt == 3'd7)
+        bit_cnt <= 3'd0; // Reset bit count after 8 bits
     else
-        bit_cnt <= bit_cnt + 1  // increment the bit count
+        bit_cnt <= bit_cnt + 1;  // increment the bit count
 end
-
-// Parameters and State Encoding:
-localparam MY_ADDR = 7'h48; // can be overwritten by mode pin
-localparam I2C_IDLE      = 4'd0;
-localparam I2C_ADDR      = 4'd1;
-localparam I2C_ADDR_ACK  = 4'd2;
-localparam I2C_REG       = 4'd3;
-localparam I2C_REG_ACK   = 4'd4;
-localparam I2C_DATA_W    = 4'd5;
-localparam I2C_DATA_ACK  = 4'd6;
-localparam I2C_DATA_R    = 4'd7;
-localparam I2C_READ_ACK  = 4'd8;
 
 // I2C Slave FSM (Internal CLK Clocked)
 always @(posedge clk or negedge rst_n) begin
@@ -133,36 +123,68 @@ always @(posedge clk or negedge rst_n) begin
                     end
                 end
                 I2C_ADDR: begin
-                    
+                    if (bit_cnt == 3'd7) begin
+                        if (sda_buffer[7:1] == MY_ADDR) begin // Check if device address is correct
+                            rw <= sda_buffer[0]; // latch r/w
+                            i2c_state <= I2C_ADDR_ACK;
+                        end else begin
+                            i2c_state <= I2C_IDLE;
+                        end
+                    end
                 end
                 I2C_ADDR_ACK: begin
-                    
+                    sda_oe <= 1'b1; // drive acknowledge signal to gnd while shifting
+                    if (bit_cnt == 3'd0) begin // full new register address has been received, 9th SCL
+                        sda_oe <= 1'b0; // Release SDA
+                        if (rw == 1'b0) // Write
+                            i2c_state <= I2C_REG;
+                        else
+                            i2c_state <= I2C_DATA_R; // Read
+                    end
                 end
                 I2C_REG: begin
-                    
+                    if (bit_cnt == 3'd7) begin
+                        reg_addr <= sda_buffer[3:0];
+                        i2c_state <= I2C_REG_ACK;
+                    end
                 end
                 I2C_REG_ACK: begin
-                    
+                    sda_oe <= 1'b1; // drive acknowledge signal to gnd while shifting
+                    if (bit_cnt == 3'd0) begin
+                        sda_oe <= 1'b0;
+                        i2c_state <= I2C_DATA_W;
+                    end
                 end
                 I2C_DATA_W: begin
-                    
+                    if (bit_cnt == 3'd7) begin
+                        transaction_complete <= 1'b1;
+                        i2c_state <= I2C_DATA_ACK;
+                    end
                 end
                 I2C_DATA_ACK: begin
-                    
+                    sda_oe <= 1'b1;
+                    if (bit_cnt == 3'd0) begin
+                        sda_oe <= 1'b0;
+                        i2c_state <= I2C_IDLE;
+                    end
                 end
                 I2C_DATA_R: begin
-                    
+                    sda_oe <= ~read_data[7-bit_cnt]; // based on register bit, release oe or keep high
+                    if (bit_cnt == 3'd7) begin
+                        i2c_state <= I2C_READ_ACK;
+                    end
                 end
-                I2C_READ_ACK begin
-                    
+                I2C_READ_ACK: begin
+                    sda_oe <= 1'b0; // Release, listen for ACK or NACK
+                    if (bit_cnt == 3'd0) begin
+                        i2c_state <= I2C_IDLE;
+                    end 
                 end
-                default: 
         
             endcase
         end
     end
 end
-
 
 
 // Register File

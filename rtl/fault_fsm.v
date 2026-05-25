@@ -39,13 +39,15 @@ reg [3:0] warn_count;
 reg       latched;
 
 always @(posedge clk or negedge rst_n) begin
-    fault_status <= {oc_a, oc_b, uv_a, uv_b, ov_a, ov_b, ot, hb_fault};
+    
     if (!rst_n) begin
         state <= INIT;
         warn_count <= 4'd0;
         latched <= 1'b0;
+        fault_status <= 8'd0; // Clear on Reset
     end else begin
         state <= next_state;
+        fault_status <= {oc_a, oc_b, uv_a, uv_b, ov_a, ov_b, ot, hb_fault};
 
         // Settling warn_count
         if (next_state == WARN)
