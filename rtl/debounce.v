@@ -32,7 +32,8 @@ always @(posedge clk or negedge rst_n) begin
         count <= 0;
     end else begin
         if (fault_in) begin
-            count <= count + 1;
+            if (count < THRESHOLD)
+                count <= count + 1;   // stop incrementing at threshold
             fault_out <= (count >= THRESHOLD);
         end else begin
             count <= 0;
