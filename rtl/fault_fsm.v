@@ -16,15 +16,17 @@ module fault_fsm
     input wire oc_a,
     input wire oc_b,
     input wire uv_a,
-    input wire ov_a,
     input wire uv_b,
+    input wire ov_a,
     input wire ov_b,
     input wire ot,
     input wire hb_fault,
     input wire mr,
     output reg en_out,
     output reg health,
-    output reg warn
+    output reg warn,
+    output reg [2:0] state,
+    output reg [7:0] fault_status
 );
 localparam INIT     = 3'd0;
 localparam NORMAL   = 3'd1;
@@ -32,12 +34,12 @@ localparam WARN     = 3'd2;
 localparam FAULT    = 3'd3;
 localparam RECOVERY = 3'd4;
 
-reg [2:0] state;
 reg [2:0] next_state;
 reg [3:0] warn_count;
 reg       latched;
 
 always @(posedge clk or negedge rst_n) begin
+    fault_status <= {oc_a, oc_b, uv_a, uv_b, ov_a, ov_b, ot, hb_fault};
     if (!rst_n) begin
         state <= INIT;
         warn_count <= 4'd0;

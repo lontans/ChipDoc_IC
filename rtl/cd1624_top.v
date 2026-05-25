@@ -47,29 +47,31 @@ wire [7:0]  hyst;
 wire [15:0] hb_timeout;
 
 i2c_slave i2c_slave (
-    .clk             (int_clk   ),
-    .rst_n           (rst_n     ),
-    .mode            (mode      ),
-    .sda             (sda       ),
-    .scl             (scl       ),
-    .v_ref_oc_a_dflt (V_REF_OC_A),
-    .v_ref_oc_b_dflt (V_REF_OC_B),
-    .v_ref_uv_a_dflt (V_REF_UV_A),
-    .v_ref_uv_b_dflt (V_REF_UV_B),
-    .v_ref_ov_a_dflt (V_REF_OV_A),
-    .v_ref_ov_b_dflt (V_REF_OV_B),
-    .v_ref_ot_dflt   (V_REF_OT  ),
-    .hyst_dflt       (HYST      ),
-    .hb_timeout_dflt (HB_TIMEOUT),
-    .v_ref_oc_a      (v_ref_oc_a),
-    .v_ref_oc_b      (v_ref_oc_b),
-    .v_ref_uv_a      (v_ref_uv_a),
-    .v_ref_uv_b      (v_ref_uv_b),
-    .v_ref_ov_a      (v_ref_ov_a),
-    .v_ref_ov_b      (v_ref_ov_b),
-    .v_ref_ot        (v_ref_ot  ),
-    .hyst            (hyst      ),
-    .hb_timeout      (hb_timeout)
+    .clk             (int_clk     ),
+    .rst_n           (rst_n       ),
+    .mode            (mode        ),
+    .sda             (sda         ),
+    .scl             (scl         ),
+    .v_ref_oc_a_dflt (V_REF_OC_A  ),
+    .v_ref_oc_b_dflt (V_REF_OC_B  ),
+    .v_ref_uv_a_dflt (V_REF_UV_A  ),
+    .v_ref_uv_b_dflt (V_REF_UV_B  ),
+    .v_ref_ov_a_dflt (V_REF_OV_A  ),
+    .v_ref_ov_b_dflt (V_REF_OV_B  ),
+    .v_ref_ot_dflt   (V_REF_OT    ),
+    .hyst_dflt       (HYST        ),
+    .hb_timeout_dflt (HB_TIMEOUT  ),
+    .v_ref_oc_a      (v_ref_oc_a  ),
+    .v_ref_oc_b      (v_ref_oc_b  ),
+    .v_ref_uv_a      (v_ref_uv_a  ),
+    .v_ref_uv_b      (v_ref_uv_b  ),
+    .v_ref_ov_a      (v_ref_ov_a  ),
+    .v_ref_ov_b      (v_ref_ov_b  ),
+    .v_ref_ot        (v_ref_ot    ),
+    .hyst            (hyst        ),
+    .hb_timeout      (hb_timeout  ),
+    .fsm_state       (fsm_state   ),
+    .fault_status    (fault_status)
 );
 
 
@@ -221,21 +223,26 @@ wd_timer #(.WIDTH(16)) hb_wd_timer (
 );
 
 // Fault FSM
+wire [2:0] fsm_state;
+wire [7:0] fault_status;
+
 fault_fsm fault_fsm (
-    .clk      (int_clk),
-    .rst_n    (rst_n),
-    .oc_a     (oc_fault_db_a),
-    .oc_b     (oc_fault_db_b),
-    .uv_a     (uv_fault_db_a),
-    .ov_a     (ov_fault_db_a),
-    .uv_b     (uv_fault_db_b),
-    .ov_b     (ov_fault_db_b),
-    .ot       (ot_fault_db),
-    .hb_fault (hb_fault),  // No db as wd_timer already detects sustained fault
-    .mr       (mr),
-    .en_out   (en_out),
-    .health   (health),
-    .warn     (warn)
+    .clk          (int_clk),
+    .rst_n        (rst_n),
+    .oc_a         (oc_fault_db_a),
+    .oc_b         (oc_fault_db_b),
+    .uv_a         (uv_fault_db_a),
+    .uv_b         (uv_fault_db_b),
+    .ov_a         (ov_fault_db_a),
+    .ov_b         (ov_fault_db_b),
+    .ot           (ot_fault_db),
+    .hb_fault     (hb_fault),  // No db as wd_timer already detects sustained fault
+    .mr           (mr),
+    .en_out       (en_out),
+    .health       (health),
+    .warn         (warn),
+    .state        (fsm_state)
+    .
 );
 
 endmodule
