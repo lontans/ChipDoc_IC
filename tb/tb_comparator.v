@@ -22,7 +22,7 @@ module tb_comparator;
 
     // GTKWave dependencies (waveforms)
     initial begin
-        $dumpfile ( "sim_records/tb_comparator.vcd" );
+        $dumpfile ( "sim/sim_records/tb_comparator.vcd" );
         $dumpvars ( 0, tb_comparator    );
     end
 

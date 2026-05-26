@@ -51,7 +51,7 @@ module tb_cd1624_top;
 
     // waveform dump
     initial begin
-        $dumpfile("tb_cd1624_top.vcd");
+        $dumpfile("sim/sim_records/tb_cd1624_top.vcd");
         $dumpvars(0, tb_cd1624_top);
     end
 

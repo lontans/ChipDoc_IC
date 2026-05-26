@@ -34,7 +34,7 @@ module tb_fault_fsm;
     always #5 clk = ~clk; // 10ns period, 100MHz
 
     initial begin
-        $dumpfile("sim_records/tb_fault_fsm.vcd");
+        $dumpfile("sim/sim_records/tb_fault_fsm.vcd");
         $dumpvars(0, tb_fault_fsm);
     end
 

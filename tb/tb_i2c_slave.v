@@ -67,7 +67,7 @@ module tb_i2c_slave;
     always #5 clk = ~clk;
 
     initial begin
-        $dumpfile("sim_records_tb_i2c_slave.vcd");
+        $dumpfile("sim/sim_records_tb_i2c_slave.vcd");
         $dumpvars(0, tb_i2c_slave);
     end
 
