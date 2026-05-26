@@ -21,7 +21,7 @@ module tb_wd_timer;
     always #5 clk = ~clk; // 10ns period, 100MHz
 
     initial begin
-        $dumpfile("tb_wd_timer.vcd");
+        $dumpfile("sim_records/tb_wd_timer.vcd");
         $dumpvars(0, tb_wd_timer);
     end
 

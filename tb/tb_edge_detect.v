@@ -19,7 +19,7 @@ module tb_edge_detect;
     always #5 clk = ~clk; // 10ns period, 100MHz
 
     initial begin
-        $dumpfile("tb_edge_detect.vcd");
+        $dumpfile("sim_records/tb_edge_detect.vcd");
         $dumpvars(0, tb_edge_detect);
     end
 
